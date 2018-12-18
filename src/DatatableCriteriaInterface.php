@@ -2,33 +2,36 @@
 
 namespace Artoroz\Datatable;
 
-use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\QueryBuilder;
 
 interface DatatableCriteriaInterface
 {
     /**
-     * @param Criteria $criteria
+     * @param QueryBuilder $builder
      *
      * @return DatatableCriteriaInterface
      */
-    public function filter(Criteria $criteria): DatatableCriteriaInterface;
+    public function filter(QueryBuilder $builder): DatatableCriteriaInterface;
 
     /**
-     * @param Criteria $criteria
+     * @param QueryBuilder $builder
      *
      * @return DatatableCriteriaInterface
      */
-    public function search(Criteria $criteria): DatatableCriteriaInterface;
+    public function search(QueryBuilder $builder): DatatableCriteriaInterface;
 
     /**
-     * @param Criteria $criteria
+     * @param QueryBuilder $builder
      *
      * @return DatatableCriteriaInterface
      */
-    public function order(Criteria $criteria): DatatableCriteriaInterface;
+    public function order(QueryBuilder $builder): DatatableCriteriaInterface;
 
     /**
-     * @return Criteria
+     * @param Collection $options
+     *
+     * @return QueryBuilder
      */
-    public function createCriteria(array $options = []): Criteria;
+    public function createBuilder(Collection $options): QueryBuilder;
 }

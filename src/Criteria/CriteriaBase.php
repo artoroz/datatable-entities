@@ -2,12 +2,14 @@
 namespace Artoroz\Datatable\Criteria;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
-use ErrorException;
-use Symfony\Component\HttpFoundation\Request;
 use Artoroz\Datatable\DatatableCriteriaInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\Common\Collections\Collection;
 use Artoroz\Datatable\Types\Field\Field;
 use Artoroz\Datatable\Types\Table;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
+use ErrorException;
 
 abstract class CriteriaBase
 {
@@ -22,15 +24,22 @@ abstract class CriteriaBase
     protected $fields;
 
     /**
+     * @var EntityManager $em
+     */
+    protected $em;
+
+    /**
      * CriteriaBase constructor.
      *
      * @param ArrayCollection $fields
      * @param Request $request
+     * @param EntityManager $em
      */
-    public function __construct(ArrayCollection $fields, Request $request)
+    public function __construct(ArrayCollection $fields, Request $request, EntityManager $em)
     {
         $this->request = $request;
         $this->fields  = $fields;
+        $this->em      = $em;
     }
 
     public function getSearchField()
@@ -66,7 +75,7 @@ abstract class CriteriaBase
             $field = $this->getFieldByNumber($order[0]['column']);
             $direction = $order[0]['dir'] == 'asc' ? 'ASC': 'DESC';
             return [
-                $field->name => $direction
+                $field->queryField => $direction
             ];
         } catch (ErrorException $e) {
             return [];
@@ -79,15 +88,15 @@ abstract class CriteriaBase
     }
 
     /**
-     * @param Criteria $criteria
+     * @param QueryBuilder $builder
      *
      * @return DatatableCriteriaInterface
      */
-    public function pagination(Criteria $criteria): DatatableCriteriaInterface
+    public function pagination(QueryBuilder $builder): DatatableCriteriaInterface
     {
         $start = $this->request->get('start') ?? 0;
         $length = $this->request->get('length') ?? 10;
-        $criteria
+        $builder
             ->setFirstResult($start)
             ->setMaxResults($length)
         ;
@@ -96,10 +105,12 @@ abstract class CriteriaBase
     }
 
     /**
-     * @return Criteria
+     * @param Collection $options
+     *
+     * @return QueryBuilder
      */
-    public function createCriteria(array $options = []): Criteria
+    public function createBuilder(Collection $options): QueryBuilder
     {
-        return new Criteria();
+        return $this->em->createQueryBuilder();
     }
 }

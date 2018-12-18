@@ -2,9 +2,10 @@
 namespace Artoroz\Datatable\Types;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Artoroz\Datatable\DatatableCriteriaInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Artoroz\Datatable\Response\DatatableResponse;
 
 abstract class DatatableResult
@@ -32,13 +33,13 @@ abstract class DatatableResult
 
     protected function getMatches() : Collection
     {
-        $criteria = $this->criteriaClass->createCriteria();
-        $this->response->recordsTotal = $this->repository->count($criteria);
+        $criteria = $this->criteriaClass->createBuilder($this->options);
+        $this->response->recordsTotal = (clone $criteria)->select('count(employee.id)')->getQuery()->getSingleScalarResult();
 
         $this->attachFilters($criteria);
-        $this->response->recordsFiltered = $this->repository->count($criteria);
+        $this->response->recordsFiltered = (clone $criteria)->select('count(employee.id)')->getQuery()->getSingleScalarResult();
 
-        return $this->repository->matching($criteria);
+        return new ArrayCollection($criteria->getQuery()->getResult());
     }
 
     public function getResultSet()
@@ -50,13 +51,13 @@ abstract class DatatableResult
         return $this->response->getResponse();
     }
 
-    public function attachFilters(Criteria $criteria): void
+    public function attachFilters(QueryBuilder $builder): void
     {
         $this->criteriaClass
-            ->filter($criteria)
-            ->search($criteria)
-            ->order($criteria)
-            ->pagination($criteria)
+            ->filter($builder)
+            ->search($builder)
+            ->order($builder)
+            ->pagination($builder)
         ;
     }
 }

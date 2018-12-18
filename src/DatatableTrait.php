@@ -7,11 +7,11 @@ use Artoroz\Datatable\Table;
 
 trait DatatableTrait
 {
-    protected function createTable($class, Request $request, $options): Table
+    protected function createTable($class, Request $request, $options = []): Table
     {
        // todo create factory for DI
          $datatableResponse = new DatatableResponse();
 
-         return new $class($datatableResponse, $request, $options);
+         return new $class($this->getDoctrine()->getManager(), $datatableResponse, $request, $options);
     }
 }

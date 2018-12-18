@@ -14,6 +14,7 @@ class ColumnField extends Field
 
     public function parseOptions(array $options)
     {
+        $this->queryField = $options['queryField'] ?? $this->queryField;
         $this->title = $options['title'] ?? '';
         $this->data = $options['data'] ?? $this->name;
         $this->searchable = $options['searchable'] ?? true;

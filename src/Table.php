@@ -6,6 +6,7 @@ use Artoroz\Datatable\Response\DatatableResponse;
 use Artoroz\Datatable\Types\DatatableResult;
 use Artoroz\Datatable\Types\Field\Field;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityRepository;
 
@@ -32,9 +33,9 @@ abstract class Table extends DatatableResult
     protected $options;
 
     /**
-     * @var EntityRepository $repository
+     * @var EntityManager $em
      */
-    protected $repository;
+    protected $em;
 
     /**
      * @var DatatableCriteriaInterface $criteriaClass
@@ -42,14 +43,15 @@ abstract class Table extends DatatableResult
     protected $criteriaClass;
 
 
-    public function __construct(DatatableResponse $response, Request $request, $options = [])
+    public function __construct(EntityManager $em, DatatableResponse $response, Request $request, $options = [])
     {
         parent::__construct($response, $request);
         $this->fields = new ArrayCollection();
         $this->options = new ArrayCollection($options);
         $this->setUp();
+        $this->em = $em;
 
-        $this->criteriaClass = new $this->criteriaClassName($this->fields, $request);
+        $this->criteriaClass = new $this->criteriaClassName($this->fields, $request, $this->em);
     }
 
     public function setUp(): void
@@ -73,17 +75,5 @@ abstract class Table extends DatatableResult
                 return $field->toArray();
             }
         )->toArray();
-    }
-
-    public function setRepository(EntityRepository $repository): Table
-    {
-        $this->repository = $repository;
-        return $this;
-    }
-
-    public function setDataStore(ArrayCollection $collection): Table
-    {
-        $this->repository = $collection;
-        return $this;
     }
 }
