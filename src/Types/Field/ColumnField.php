@@ -10,6 +10,7 @@ class ColumnField extends Field
     public $visible = true;
     public $className = null;
     public $transformer = null;
+    public $raw = null;
 
     public function parseOptions(array $options)
     {
@@ -20,6 +21,7 @@ class ColumnField extends Field
         $this->visible = $options['visible'] ?? true;
         $this->className = $options['className'] ?? '';
         $this->transformer = $options['transformer'] ?? null;
+        $this->raw = $options['raw'] ?? false;
     }
 
     public function toArray()
@@ -39,6 +41,9 @@ class ColumnField extends Field
         $entry = $this->getFromEntity($entity);
         if (is_callable($this->transformer)) {
             return call_user_func($this->transformer, $entry);
+        }
+        if (!$this->raw) {
+            $entry = htmlspecialchars($entry);
         }
         return $entry;
     }
