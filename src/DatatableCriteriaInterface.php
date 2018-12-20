@@ -27,11 +27,4 @@ interface DatatableCriteriaInterface
      * @return DatatableCriteriaInterface
      */
     public function order(QueryBuilder $builder): DatatableCriteriaInterface;
-
-    /**
-     * @param Collection $options
-     *
-     * @return QueryBuilder
-     */
-    public function createBuilder(Collection $options): QueryBuilder;
 }

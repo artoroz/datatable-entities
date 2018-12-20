@@ -18,14 +18,14 @@ abstract class Table extends DatatableResult
     protected $criteriaClassName;
 
     /**
-     * @var string $entityClassName
-     */
-    protected $entityClassName;
-
-    /**
      * @var ArrayCollection $fields
      */
     protected $fields;
+
+    /**
+     * @var DatatableRepositoryInterface $repository
+     */
+    public $repository;
 
     /**
      * @var ArrayCollection $options
@@ -33,38 +33,41 @@ abstract class Table extends DatatableResult
     protected $options;
 
     /**
-     * @var EntityManager $em
-     */
-    protected $em;
-
-    /**
      * @var DatatableCriteriaInterface $criteriaClass
      */
     protected $criteriaClass;
 
 
-    public function __construct(EntityManager $em, DatatableResponse $response, Request $request, $options = [])
+    public function __construct(Request $request, $options = [])
     {
-        parent::__construct($response, $request);
+        parent::__construct($this, $request);
+        $this->response->draw = (int)$request->get('draw');
         $this->fields = new ArrayCollection();
         $this->options = new ArrayCollection($options);
         $this->setUp();
-        $this->em = $em;
 
-        $this->criteriaClass = new $this->criteriaClassName($this->fields, $request, $this->em);
+        $this->criteriaClass = new $this->criteriaClassName($this, $request);
     }
 
     public function setUp(): void
     {
     }
 
-    public function add($field, $className, $options = []): Table
+    public function setRepository(DatatableRepositoryInterface $repository): Table
     {
-        $field = new $className($field, $options);
-
-        $this->fields->add($field);
-
+        $this->repository = $repository;
         return $this;
+    }
+
+    public function add($fieldName, $className, $options = []): Table
+    {
+        $field = new $className($fieldName, $options);
+        $this->fields->add($field);
+        return $this;
+    }
+    public function get($fieldName): ?Field
+    {
+        return $this->fields->get($fieldName);
     }
 
     public function getColumns(): array

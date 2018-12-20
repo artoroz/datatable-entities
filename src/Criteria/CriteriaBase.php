@@ -6,9 +6,9 @@ use Artoroz\Datatable\DatatableCriteriaInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Collections\Collection;
 use Artoroz\Datatable\Types\Field\Field;
-use Artoroz\Datatable\Types\Table;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Artoroz\Datatable;
 use ErrorException;
 
 abstract class CriteriaBase
@@ -19,27 +19,25 @@ abstract class CriteriaBase
     protected $request;
 
     /**
-     * @var ArrayCollection<Field> $fields;
+     * @var string $prefix;
      */
-    protected $fields;
+    protected $prefix = '';
 
     /**
-     * @var EntityManager $em
+     * @var Table $table
      */
-    protected $em;
+    protected $table;
 
     /**
      * CriteriaBase constructor.
      *
-     * @param ArrayCollection $fields
+     * @param Table $table
      * @param Request $request
-     * @param EntityManager $em
      */
-    public function __construct(ArrayCollection $fields, Request $request, EntityManager $em)
+    public function __construct($table, Request $request)
     {
+        $this->table  = $table;
         $this->request = $request;
-        $this->fields  = $fields;
-        $this->em      = $em;
     }
 
     public function getSearchField()
@@ -75,16 +73,17 @@ abstract class CriteriaBase
             $field = $this->getFieldByNumber($order[0]['column']);
             $direction = $order[0]['dir'] == 'asc' ? 'ASC': 'DESC';
             return [
-                $field->queryField => $direction
+                $field->queryField,
+                $direction
             ];
         } catch (ErrorException $e) {
-            return [];
+            return false;
         }
     }
 
     protected function getFieldByNumber($column)
     {
-        return $this->fields->get($column);
+        return $this->table->get($column);
     }
 
     /**
@@ -102,15 +101,5 @@ abstract class CriteriaBase
         ;
 
         return $this;
-    }
-
-    /**
-     * @param Collection $options
-     *
-     * @return QueryBuilder
-     */
-    public function createBuilder(Collection $options): QueryBuilder
-    {
-        return $this->em->createQueryBuilder();
     }
 }

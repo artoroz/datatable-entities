@@ -1,6 +1,7 @@
 <?php
 namespace Artoroz\Datatable\Types;
 
+use Artoroz\Datatable\Table;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,24 +21,25 @@ abstract class DatatableResult
      * @var DatatableCriteriaInterface $criteriaClass
      */
     protected $criteriaClass;
+
     /**
-     * @var Request
+     * @var Request $request
      */
     private $request;
 
-    public function __construct(DatatableResponse $response, Request $request)
+    public function __construct(Table $table, Request $request)
     {
-        $this->response = $response;
+        $this->response = new DatatableResponse();
         $this->request = $request;
     }
 
     protected function getMatches() : Collection
     {
-        $criteria = $this->criteriaClass->createBuilder($this->options);
-        $this->response->recordsTotal = (clone $criteria)->select('count(employee.id)')->getQuery()->getSingleScalarResult();
+        $criteria = $this->repository->createBuilder($this->options);
+        $this->response->recordsTotal = $this->repository->countResults(clone $criteria);
 
         $this->attachFilters($criteria);
-        $this->response->recordsFiltered = (clone $criteria)->select('count(employee.id)')->getQuery()->getSingleScalarResult();
+        $this->response->recordsFiltered = $this->repository->countResults(clone $criteria);
 
         return new ArrayCollection($criteria->getQuery()->getResult());
     }
