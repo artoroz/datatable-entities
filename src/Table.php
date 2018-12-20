@@ -23,6 +23,11 @@ abstract class Table extends DatatableResult
     protected $fields;
 
     /**
+     * @var object $user
+     */
+    protected $user;
+
+    /**
      * @var DatatableRepositoryInterface $repository
      */
     public $repository;
@@ -38,11 +43,12 @@ abstract class Table extends DatatableResult
     protected $criteriaClass;
 
 
-    public function __construct(Request $request, $options = [])
+    public function __construct(Request $request, $user, $options = [])
     {
         parent::__construct($this, $request);
         $this->response->draw = (int)$request->get('draw');
         $this->fields = new ArrayCollection();
+        $this->user = $user;
         $this->options = new ArrayCollection($options);
         $this->setUp();
 

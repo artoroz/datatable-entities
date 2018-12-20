@@ -36,6 +36,11 @@ abstract class DatatableResult
     protected function getMatches() : Collection
     {
         $criteria = $this->repository->createBuilder($this->options);
+        if (method_exists($this->repository, 'setupPermissions')) {
+            $this->repository->setupPermissions($criteria, $this->user, $this->options);
+        }
+
+
         $this->response->recordsTotal = $this->repository->countResults(clone $criteria);
 
         $this->attachFilters($criteria);

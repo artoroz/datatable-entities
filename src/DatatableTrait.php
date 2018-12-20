@@ -13,7 +13,7 @@ trait DatatableTrait
 
          $repository = $this->getDoctrine()->getManager()->getRepository($entityClass);
 
-         return (new $tableClass($request, $options))
+         return (new $tableClass($request, $this->getUser(), $options))
              ->setRepository($repository);
     }
 }
