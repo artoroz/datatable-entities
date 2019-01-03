@@ -71,12 +71,15 @@ abstract class CriteriaBase
         $order = $this->request->get('order');
         try {
             $field = $this->getFieldByNumber($order[0]['column']);
+            if (is_null($field)) {
+                return false;
+            }
             $direction = $order[0]['dir'] == 'asc' ? 'ASC': 'DESC';
             return [
                 $field->queryField,
                 $direction
             ];
-        } catch (ErrorException $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
