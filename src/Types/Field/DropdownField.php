@@ -5,6 +5,17 @@ class DropdownField extends ColumnField
 {
     public $actions = [];
 
+    const BOOTSTRAP_ACTIONS_TEMPLATE = <<<BOOTSTRAP_ACTIONS_TEMPLATE
+        <div class="btn-group table-actions">
+            <button type="button" class="btn btn-default btn-icon dropdown-toggle" data-toggle="dropdown">
+                <span class="mi mi-more_vert"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <actions/>
+            </ul>
+        </div>
+BOOTSTRAP_ACTIONS_TEMPLATE;
+
     public function parseOptions(array $options)
     {
         parent::parseOptions($options);

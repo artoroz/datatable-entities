@@ -10,8 +10,9 @@ trait DatatableTrait
     protected function createTable($tableClass, $entityClass, Request $request, $options = []): Table
     {
        // todo create factory for DI
+        $em = isset($options['em']) ? $options['em'] : $this->getDoctrine()->getManager();
 
-         $repository = $this->getDoctrine()->getManager()->getRepository($entityClass);
+         $repository = $em->getRepository($entityClass);
 
          return (new $tableClass($request, $this->getUser(), $options))
              ->setRepository($repository);
