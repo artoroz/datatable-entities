@@ -40,7 +40,6 @@ abstract class DatatableResult
             $this->repository->setupPermissions($criteria, $this->user, $this->options);
         }
 
-
         $this->response->recordsTotal = $this->repository->countResults(clone $criteria);
 
         $this->attachFilters($criteria);

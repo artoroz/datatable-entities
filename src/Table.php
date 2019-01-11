@@ -51,7 +51,6 @@ abstract class Table extends DatatableResult
         $this->user = $user;
         $this->options = new ArrayCollection($options);
         $this->setUp();
-
         $this->criteriaClass = new $this->criteriaClassName($this, $request);
     }
 
