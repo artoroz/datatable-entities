@@ -23,7 +23,7 @@ class DateTimeField extends ColumnField
         }
 
         return [
-            'display' => $entry->format('d-m-Y H:m:i'),
+            'display' => $entry->format('d-m-Y H:i:s'),
             'timestamp' => $entry->getTimestamp()
         ];
     }
