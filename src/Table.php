@@ -35,7 +35,7 @@ abstract class Table extends DatatableResult
     /**
      * @var ArrayCollection $options
      */
-    protected $options;
+    public $options;
 
     /**
      * @var DatatableCriteriaInterface $criteriaClass

@@ -89,6 +89,11 @@ abstract class CriteriaBase
         return $this->table->get($column);
     }
 
+    protected function getOption($key)
+    {
+        return $this->table->options->get($key);
+    }
+
     /**
      * @param QueryBuilder $builder
      *
