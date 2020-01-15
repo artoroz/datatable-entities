@@ -29,6 +29,16 @@ abstract class CriteriaBase
     protected $table;
 
     /**
+     * @var string $dataOrderProperty
+     */
+    protected $dataOrderProperty;
+
+    /**
+     * @var string $dataOrderDirection
+     */
+    protected $dataOrderDirection;
+
+    /**
      * CriteriaBase constructor.
      *
      * @param Table $table
@@ -75,6 +85,16 @@ abstract class CriteriaBase
                 return false;
             }
             $direction = $order[0]['dir'] == 'asc' ? 'ASC': 'DESC';
+
+            // Check if the propert exists in the Class for ordering a dynamic column
+            if ($this->table->getEntityClassName()) {
+                if (! property_exists($this->table->getEntityClassName(), $field->name)) {
+                    $this->dataOrderProperty = $field->name;
+                    $this->dataOrderDirection = $direction;
+                    return false;
+                }
+            }
+
             return [
                 $field->queryField,
                 $direction
@@ -109,5 +129,20 @@ abstract class CriteriaBase
         ;
 
         return $this;
+    }
+
+    public function getTable(): Datatable\Table
+    {
+        return $this->table;
+    }
+
+    public function getDataOrderProperty(): ?string
+    {
+        return $this->dataOrderProperty;
+    }
+
+    public function getDataOrderDirection(): ?string
+    {
+        return $this->dataOrderDirection;
     }
 }

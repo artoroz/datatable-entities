@@ -18,6 +18,11 @@ abstract class Table extends DatatableResult
     protected $criteriaClassName;
 
     /**
+     * @var string $entityClassName
+     */
+    protected $entityClassName;
+
+    /**
      * @var ArrayCollection $fields
      */
     protected $fields;
@@ -83,5 +88,10 @@ abstract class Table extends DatatableResult
                 return $field->toArray();
             }
         )->toArray();
+    }
+
+    public function getEntityClassName(): ?string
+    {
+        return $this->entityClassName;
     }
 }
