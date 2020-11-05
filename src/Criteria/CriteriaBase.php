@@ -88,7 +88,10 @@ abstract class CriteriaBase
 
             // Check if the propert exists in the Class for ordering a dynamic column
             if ($this->table->getEntityClassName()) {
-                if (! property_exists($this->table->getEntityClassName(), $field->name)) {
+                if (
+                    ! property_exists($this->table->getEntityClassName(), $field->name) &&
+                    strpos($field->queryField, '.') == 0
+                ) {
                     $this->dataOrderProperty = $field->name;
                     $this->dataOrderDirection = $direction;
                     return false;
