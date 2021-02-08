@@ -1,4 +1,5 @@
 <?php
+
 namespace Artoroz\Datatable\Types\Field;
 
 class DateTimeField extends ColumnField
@@ -12,6 +13,7 @@ class DateTimeField extends ColumnField
             'sort' => $this->name . '.timestamp'
         ];
     }
+
     public function parseField($entity)
     {
         $entry = $this->getFromEntity($entity);

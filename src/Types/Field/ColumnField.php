@@ -1,4 +1,5 @@
 <?php
+
 namespace Artoroz\Datatable\Types\Field;
 
 class ColumnField extends Field
