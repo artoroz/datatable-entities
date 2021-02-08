@@ -1,4 +1,5 @@
 <?php
+
 namespace Artoroz\Datatable\Types;
 
 use Artoroz\Datatable\Table;
@@ -11,7 +12,6 @@ use Artoroz\Datatable\Response\DatatableResponse;
 
 abstract class DatatableResult
 {
-
     /**
      * @var DatatableResponse
      */
@@ -25,7 +25,7 @@ abstract class DatatableResult
     /**
      * @var Request $request
      */
-    private $request;
+    protected $request;
 
     public function __construct(Table $table, Request $request)
     {
@@ -33,7 +33,7 @@ abstract class DatatableResult
         $this->request = $request;
     }
 
-    protected function getMatches() : Collection
+    protected function getMatches(): Collection
     {
         $criteria = $this->repository->createBuilder($this->options);
         if (method_exists($this->repository, 'setupPermissions')) {
@@ -58,18 +58,15 @@ abstract class DatatableResult
 
         // When sorting on a non-existing database field (dynamic column)
         if ($orderProperty && $orderDirection) {
-            $getter = "get" . ucfirst($orderProperty);
+            $getter = 'get' . ucfirst($orderProperty);
 
             if (method_exists($class, $getter)) {
                 $iterator = $matches->getIterator();
-                $iterator->uasort(function ($a, $b) use($getter, $orderDirection) {
-                    if ($a->$getter() == $b->$getter()) {
-                        return 0;
-                    }
-                    if ($orderDirection == "DESC") {
-                        return (strcmp($a->$getter(), $b->$getter()) < 0 ? 1 : -1);
+                $iterator->uasort(function ($a, $b) use ($getter, $orderDirection) {
+                    if ($orderDirection == 'DESC') {
+                        return strnatcmp($b->$getter(), $a->$getter());
                     } else {
-                        return (strcmp($a->$getter(), $b->$getter()) < 0 ? -1 : 1);
+                        return strnatcmp($a->$getter(), $b->$getter());
                     }
                 });
                 $matches = new ArrayCollection(array_values(iterator_to_array($iterator)));
