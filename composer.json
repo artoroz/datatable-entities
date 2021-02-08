@@ -1,11 +1,12 @@
 {
-  "name": "Artoroz/datatable-entities",
+  "name": "artoroz/datatable-entities",
   "type": "library",
   "description": "Faker is a PHP library that generates fake data for you.",
   "keywords": ["datatable", "symfony", "doctrine"],
   "license": "MIT",
   "require": {
-    "php": "^7.1"
+    "php": "^7.1|^8.0",
+    "symfony/property-access": "^5.0"
   },
   "autoload": {
     "psr-4": {

@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Artoroz\Datatable\DatatableCriteriaInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Artoroz\Datatable\Response\DatatableResponse;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 abstract class DatatableResult
 {
@@ -58,19 +59,20 @@ abstract class DatatableResult
 
         // When sorting on a non-existing database field (dynamic column)
         if ($orderProperty && $orderDirection) {
-            $getter = 'get' . ucfirst($orderProperty);
+            $iterator = $matches->getIterator();
+            $iterator->uasort(function ($a, $b) use ($orderProperty, $orderDirection) {
 
-            if (method_exists($class, $getter)) {
-                $iterator = $matches->getIterator();
-                $iterator->uasort(function ($a, $b) use ($getter, $orderDirection) {
-                    if ($orderDirection == 'DESC') {
-                        return strnatcmp($b->$getter(), $a->$getter());
-                    } else {
-                        return strnatcmp($a->$getter(), $b->$getter());
-                    }
-                });
-                $matches = new ArrayCollection(array_values(iterator_to_array($iterator)));
-            }
+                $propertyAccessor = PropertyAccess::createPropertyAccessor();
+                $aValue = $propertyAccessor->getValue($a, $orderProperty);
+                $bValue = $propertyAccessor->getValue($b, $orderProperty);
+
+                if ($orderDirection == 'DESC') {
+                    return strnatcmp($bValue, $aValue);
+                } else {
+                    return strnatcmp($aValue, $bValue);
+                }
+            });
+            $matches = new ArrayCollection(array_values(iterator_to_array($iterator)));
         }
 
         $this->response->setData($matches);
