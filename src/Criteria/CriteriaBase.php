@@ -78,8 +78,12 @@ abstract class CriteriaBase
 
     protected function getOrderBy()
     {
-        $order = $this->request->get('order');
+        $order = (array) $this->request->get('order');
         try {
+            if (! array_key_exists(0, $order) ||
+                ! array_key_exists('column', $order[0])) {
+                return false;
+            }
             $field = $this->getFieldByNumber($order[0]['column']);
             if (is_null($field)) {
                 return false;
