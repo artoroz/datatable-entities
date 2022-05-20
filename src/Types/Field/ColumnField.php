@@ -42,9 +42,9 @@ class ColumnField extends Field
     {
         $entry = $this->getFromEntity($entity);
         if (is_callable($this->transformer)) {
-            return call_user_func($this->transformer, $entry, $entity);
+            $entry = call_user_func($this->transformer, $entry, $entity);
         }
-        if (!$this->raw) {
+        if (! $this->raw) {
             $entry = htmlspecialchars($entry);
         }
         return $entry;
