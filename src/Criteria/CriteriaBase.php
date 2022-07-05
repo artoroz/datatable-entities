@@ -8,7 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Artoroz\Datatable;
 use ErrorException;
 
-abstract class CriteriaBase
+abstract class CriteriaBase implements DatatableCriteriaInterface
 {
     /**
      * @var Request $request;
