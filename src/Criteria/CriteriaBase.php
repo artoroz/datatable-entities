@@ -1,12 +1,8 @@
 <?php
 namespace Artoroz\Datatable\Criteria;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Artoroz\Datatable\DatatableCriteriaInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Collections\Collection;
-use Artoroz\Datatable\Types\Field\Field;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Artoroz\Datatable;
 use ErrorException;

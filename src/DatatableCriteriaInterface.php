@@ -2,7 +2,6 @@
 
 namespace Artoroz\Datatable;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
 
 interface DatatableCriteriaInterface
