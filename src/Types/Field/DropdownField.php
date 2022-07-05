@@ -31,7 +31,7 @@ BOOTSTRAP_ACTIONS_TEMPLATE;
         if (is_callable($this->actions)) {
             return call_user_func($this->actions, $entity);
         }
-        return $entry;
+        return parent::parseField($entity);
 
     }
 }
