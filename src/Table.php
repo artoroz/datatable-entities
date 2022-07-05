@@ -1,14 +1,10 @@
 <?php
 namespace Artoroz\Datatable;
 
-use Artoroz\Datatable\DatatableCriteriaInterface;
-use Artoroz\Datatable\Response\DatatableResponse;
 use Artoroz\Datatable\Types\DatatableResult;
 use Artoroz\Datatable\Types\Field\Field;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityRepository;
 
 abstract class Table extends DatatableResult
 {
