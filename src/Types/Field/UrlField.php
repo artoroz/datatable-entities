@@ -22,6 +22,6 @@ class UrlField extends ColumnField
             return '';
         }
 
-        return call_user_func($this->url_builder, $row);;
+        return call_user_func($this->url_builder, $row);
     }
 }
