@@ -1,19 +1,13 @@
 <?php
 namespace Artoroz\Datatable;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 trait DatatableTrait
 {
-    protected abstract function getEntityManager(): EntityManagerInterface;
-    protected abstract function getUser(): ?UserInterface;
-
     protected function createTable($tableClass, $entityClass, Request $request, $options = []): Table
     {
-       /** @var EntityManagerInterface $em */
-        $em = $options['em'] ?? $this->getEntityManager();
+        $em = isset($options['em']) ? $options['em'] : $this->getDoctrine()->getManager();
 
         if ($entityClass instanceof DatatableRepositoryInterface) {
             $repository = $entityClass;
@@ -25,4 +19,3 @@ trait DatatableTrait
              ->setRepository($repository);
     }
 }
-
