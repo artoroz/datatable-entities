@@ -3,21 +3,23 @@
 namespace Artoroz\Datatable;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\QueryBuilder;
 
+/**
+ * @phpstan-type DataTableQueryBuilder \Somnambulist\CTEBuilder\ExpressionBuilder|\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder
+ */
 interface DatatableRepositoryInterface
 {
     /**
      * @param Collection $options
      *
-     * @return QueryBuilder
+     * @return DataTableQueryBuilder
      */
-    public function createBuilder(Collection $options): QueryBuilder;
+    public function createBuilder(Collection $options);
 
     /**
-     * @param QueryBuilder $builder
+     * @param DataTableQueryBuilder $builder
      *
      * @return int
      */
-    public function countResults(QueryBuilder $builder): int;
+    public function countResults($builder): int;
 }
