@@ -2,28 +2,29 @@
 
 namespace Artoroz\Datatable;
 
-use Doctrine\ORM\QueryBuilder;
-
+/**
+ * @phpstan-import-type DataTableQueryBuilder from DatatableRepositoryInterface
+ */
 interface DatatableCriteriaInterface
 {
     /**
-     * @param QueryBuilder $builder
+     * @param DataTableQueryBuilder $builder
      *
      * @return DatatableCriteriaInterface
      */
-    public function filter(QueryBuilder $builder): DatatableCriteriaInterface;
+    public function filter($builder): DatatableCriteriaInterface;
 
     /**
-     * @param QueryBuilder $builder
+     * @param DataTableQueryBuilder $builder
      *
      * @return DatatableCriteriaInterface
      */
-    public function search(QueryBuilder $builder): DatatableCriteriaInterface;
+    public function search($builder): DatatableCriteriaInterface;
 
     /**
-     * @param QueryBuilder $builder
+     * @param DataTableQueryBuilder $builder
      *
      * @return DatatableCriteriaInterface
      */
-    public function order(QueryBuilder $builder): DatatableCriteriaInterface;
+    public function order($builder): DatatableCriteriaInterface;
 }

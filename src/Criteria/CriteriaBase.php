@@ -4,10 +4,12 @@ namespace Artoroz\Datatable\Criteria;
 use Artoroz\Datatable\DatatableCriteriaInterface;
 use Artoroz\Datatable\Table;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\QueryBuilder;
 use Artoroz\Datatable;
 use ErrorException;
 
+/**
+ * @phpstan-import-type DataTableQueryBuilder from DatatableRepositoryInterface
+ */
 abstract class CriteriaBase implements DatatableCriteriaInterface
 {
     /**
@@ -119,11 +121,11 @@ abstract class CriteriaBase implements DatatableCriteriaInterface
     }
 
     /**
-     * @param QueryBuilder $builder
+     * @param DataTableQueryBuilder $builder
      *
      * @return DatatableCriteriaInterface
      */
-    public function pagination(QueryBuilder $builder): DatatableCriteriaInterface
+    public function pagination($builder): DatatableCriteriaInterface
     {
         $start = $this->request->get('start') ?? 0;
         $length = $this->request->get('length') ?? 10;

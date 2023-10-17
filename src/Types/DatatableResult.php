@@ -3,6 +3,7 @@
 namespace Artoroz\Datatable\Types;
 
 use Artoroz\Datatable\Table;
+use Artoroz\Datatable\DatatableRepositoryInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,6 +12,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Artoroz\Datatable\Response\DatatableResponse;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * @phpstan-import-type DataTableQueryBuilder from DatatableRepositoryInterface
+ */
 abstract class DatatableResult
 {
     /**
@@ -46,7 +50,17 @@ abstract class DatatableResult
         $this->attachFilters($criteria);
         $this->response->recordsFiltered = $this->repository->countResults(clone $criteria);
 
-        return new ArrayCollection($criteria->getQuery()->getResult());
+        if ($criteria instanceof QueryBuilder) {
+            $matches = $criteria->getQuery()
+                ->getResult();
+        } else {
+            $matches = [];
+
+            foreach ($criteria->execute()->fetchAllAssociative() as $record) {
+                $matches[] = (object) $record;
+            }
+        }
+        return new ArrayCollection($matches);
     }
 
     public function getResultSet()
@@ -81,7 +95,10 @@ abstract class DatatableResult
         return $this->response->getResponse();
     }
 
-    public function attachFilters(QueryBuilder $builder): void
+    /**
+     * @param DataTableQueryBuilder $builder
+     */
+    public function attachFilters($builder): void
     {
         $this->criteriaClass
             ->filter($builder)
