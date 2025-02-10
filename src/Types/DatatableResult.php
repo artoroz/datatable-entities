@@ -2,7 +2,6 @@
 
 namespace Artoroz\Datatable\Types;
 
-use Artoroz\Datatable\Table;
 use Artoroz\Datatable\DatatableRepositoryInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
@@ -52,7 +51,7 @@ abstract class DatatableResult
      */
     public $options;
 
-    public function __construct(Table $table, Request $request)
+    public function __construct(Request $request)
     {
         $this->response = new DatatableResponse();
         $this->request = $request;

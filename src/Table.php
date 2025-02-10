@@ -26,7 +26,7 @@ abstract class Table extends DatatableResult
 
     public function __construct(Request $request, $user, $options = [])
     {
-        parent::__construct($this, $request);
+        parent::__construct($request);
         $this->response->draw = (int)$request->get('draw');
         $this->fields = new ArrayCollection();
         $this->user = $user;
