@@ -17,5 +17,8 @@
     "psr-4": {
       "Artoroz\\Datatable\\": "src/"
     }
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.1"
   }
 }
