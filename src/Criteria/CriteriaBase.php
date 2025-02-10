@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Artoroz\Datatable\Criteria;
 
+use Artoroz\Datatable;
 use Artoroz\Datatable\DatatableCriteriaInterface;
 use Artoroz\Datatable\DatatableRepositoryInterface;
 use Artoroz\Datatable\Table;
+use ErrorException;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
-use Artoroz\Datatable;
-use ErrorException;
 
 /**
  * @phpstan-import-type DataTableQueryBuilder from DatatableRepositoryInterface

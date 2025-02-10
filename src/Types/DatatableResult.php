@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Artoroz\Datatable\Types;
 
 use ArrayIterator;
+use Artoroz\Datatable\DatatableCriteriaInterface;
 use Artoroz\Datatable\DatatableRepositoryInterface;
+use Artoroz\Datatable\Response\DatatableResponse;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
-use Artoroz\Datatable\DatatableCriteriaInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Artoroz\Datatable\Response\DatatableResponse;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
