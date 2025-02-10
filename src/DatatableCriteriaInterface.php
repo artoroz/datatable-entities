@@ -27,4 +27,11 @@ interface DatatableCriteriaInterface
      * @return DatatableCriteriaInterface
      */
     public function order($builder): DatatableCriteriaInterface;
+
+    /**
+     * @param DataTableQueryBuilder $builder
+     *
+     * @return DatatableCriteriaInterface
+     */
+    public function pagination($builder): DatatableCriteriaInterface;
 }
