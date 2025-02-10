@@ -9,12 +9,11 @@ abstract class Field
     public $queryField = '';
     protected $accessor = '';
 
-    public function __construct($field, array $options)
+    public function __construct($field)
     {
         $this->accessor =  PropertyAccess::createPropertyAccessor();
         $this->name =  $field;
         $this->queryField =  $field;
-        $this->parseOptions($options);
     }
 
     public function toArray()

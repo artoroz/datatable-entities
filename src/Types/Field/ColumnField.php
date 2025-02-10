@@ -13,6 +13,13 @@ class ColumnField extends Field
     public $transformer = null;
     public $raw = null;
 
+    public function __construct($field, array $options)
+    {
+        parent::__construct($field);
+
+        $this->parseOptions($options);
+    }
+
     public function parseOptions(array $options)
     {
         $this->queryField = $options['queryField'] ?? $this->queryField;
