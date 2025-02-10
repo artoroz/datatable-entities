@@ -6,9 +6,9 @@ namespace Artoroz\Datatable\Types\Field;
 
 class UrlField extends ColumnField
 {
-    public $url_builder = null;
+    public mixed $url_builder = null;
 
-    public function parseOptions(array $options)
+    public function parseOptions(array $options): void
     {
         parent::parseOptions($options);
         $this->data = 'data_url';
@@ -19,12 +19,12 @@ class UrlField extends ColumnField
         $this->url_builder =  $options['url_builder'] ?? null;
     }
 
-    public function parseField($row)
+    public function parseField(object $entity): mixed
     {
         if (! is_callable($this->url_builder)) {
             return '';
         }
 
-        return call_user_func($this->url_builder, $row);
+        return call_user_func($this->url_builder, $entity);
     }
 }

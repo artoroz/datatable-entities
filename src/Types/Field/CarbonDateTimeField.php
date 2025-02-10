@@ -8,7 +8,7 @@ use Carbon\CarbonInterface;
 
 class CarbonDateTimeField extends DateTimeField
 {
-    public function parseField($entity)
+    public function parseField(object $entity): mixed
     {
         $entry = $this->getFromEntity($entity);
 

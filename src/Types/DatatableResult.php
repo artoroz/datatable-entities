@@ -8,58 +8,42 @@ use ArrayIterator;
 use Artoroz\Datatable\DatatableCriteriaInterface;
 use Artoroz\Datatable\DatatableRepositoryInterface;
 use Artoroz\Datatable\Response\DatatableResponse;
+use Artoroz\Datatable\Types\Field\ColumnField;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
+use Somnambulist\Components\CTEBuilder\ExpressionBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
- * @phpstan-import-type DataTableQueryBuilder from DatatableRepositoryInterface
+ * @phpstan-import-type ResponseArray from DatatableResponse
  */
 abstract class DatatableResult
 {
+    protected DatatableResponse $response;
+    protected DatatableCriteriaInterface $criteriaClass;
     /**
-     * @var DatatableResponse
+     * @var ArrayCollection<array-key, ColumnField> $fields
      */
-    protected $response;
-
+    protected ArrayCollection $fields;
+    protected object $user;
+    public DatatableRepositoryInterface $repository;
     /**
-     * @var DatatableCriteriaInterface $criteriaClass
+     * @var ArrayCollection<string, mixed> $options
      */
-    protected $criteriaClass;
+    public ArrayCollection $options;
 
-    /**
-     * @var Request $request
-     */
-    protected $request;
-
-    /**
-     * @var ArrayCollection $fields
-     */
-    protected $fields;
-
-    /**
-     * @var object $user
-     */
-    protected $user;
-
-    /**
-     * @var DatatableRepositoryInterface $repository
-     */
-    public $repository;
-
-    /**
-     * @var ArrayCollection $options
-     */
-    public $options;
-
-    public function __construct(Request $request)
-    {
+    public function __construct(
+        protected Request $request,
+    ) {
         $this->response = new DatatableResponse();
-        $this->request = $request;
     }
 
+    /**
+     * @return Collection<array-key, object>
+     */
     protected function getMatches(): Collection
     {
         $criteria = $this->repository->createBuilder($this->options);
@@ -85,7 +69,10 @@ abstract class DatatableResult
         return new ArrayCollection($matches);
     }
 
-    public function getResultSet()
+    /**
+     * @return ResponseArray
+     */
+    public function getResultSet(): array
     {
         $matches = $this->getMatches();
 
@@ -95,7 +82,7 @@ abstract class DatatableResult
 
         // When sorting on a non-existing database field (dynamic column)
         if ($orderProperty && $orderDirection) {
-            /** @var ArrayIterator $iterator */
+            /** @var ArrayIterator<array-key, object> $iterator */
             $iterator = $matches->getIterator();
             $iterator->uasort(function ($a, $b) use ($orderProperty, $orderDirection) {
 
@@ -118,10 +105,7 @@ abstract class DatatableResult
         return $this->response->getResponse();
     }
 
-    /**
-     * @param DataTableQueryBuilder $builder
-     */
-    public function attachFilters($builder): void
+    public function attachFilters(ExpressionBuilder|QueryBuilder|DbalQueryBuilder$builder): void
     {
         $this->criteriaClass
             ->filter($builder)

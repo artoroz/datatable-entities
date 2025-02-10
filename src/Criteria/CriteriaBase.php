@@ -4,61 +4,36 @@ declare(strict_types=1);
 
 namespace Artoroz\Datatable\Criteria;
 
-use Artoroz\Datatable;
 use Artoroz\Datatable\DatatableCriteriaInterface;
-use Artoroz\Datatable\DatatableRepositoryInterface;
 use Artoroz\Datatable\Table;
+use Artoroz\Datatable\Types\Field\ColumnField;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\QueryBuilder;
 use ErrorException;
 use Exception;
+use Somnambulist\Components\CTEBuilder\ExpressionBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @phpstan-import-type DataTableQueryBuilder from DatatableRepositoryInterface
- */
 abstract class CriteriaBase implements DatatableCriteriaInterface
 {
-    /**
-     * @var Request $request;
-     */
-    protected $request;
+    protected string $prefix = '';
+    protected ?string $dataOrderProperty = null;
+    protected ?string $dataOrderDirection = null;
 
-    /**
-     * @var string $prefix;
-     */
-    protected $prefix = '';
-
-    /**
-     * @var Table $table
-     */
-    protected $table;
-
-    /**
-     * @var string $dataOrderProperty
-     */
-    protected $dataOrderProperty;
-
-    /**
-     * @var string $dataOrderDirection
-     */
-    protected $dataOrderDirection;
-
-    /**
-     * CriteriaBase constructor.
-     *
-     * @param Table $table
-     * @param Request $request
-     */
-    public function __construct($table, Request $request)
-    {
-        $this->table  = $table;
-        $this->request = $request;
+    public function __construct(
+        protected Table $table,
+        protected Request $request,
+    ) {
     }
 
-    public function getSearchField()
+    public function getSearchField(): mixed
     {
         return $this->request->get('search');
     }
 
+    /**
+     * @return array<string, mixed>|array{error:Exception}
+     */
     protected function getFilterRequest() : array
     {
         $fields = [];
@@ -80,7 +55,10 @@ abstract class CriteriaBase implements DatatableCriteriaInterface
         }
     }
 
-    protected function getOrderBy()
+    /**
+     * @return array{0:string, 1:string}|false
+     */
+    protected function getOrderBy(): array|false
     {
         $order = (array) $this->request->get('order');
         try {
@@ -115,22 +93,17 @@ abstract class CriteriaBase implements DatatableCriteriaInterface
         }
     }
 
-    protected function getFieldByNumber($column)
+    protected function getFieldByNumber(int|string $column): ?ColumnField
     {
         return $this->table->get($column);
     }
 
-    protected function getOption($key)
+    protected function getOption(string $key): mixed
     {
         return $this->table->options->get($key);
     }
 
-    /**
-     * @param DataTableQueryBuilder $builder
-     *
-     * @return DatatableCriteriaInterface
-     */
-    public function pagination($builder): DatatableCriteriaInterface
+    public function pagination(ExpressionBuilder|QueryBuilder|DbalQueryBuilder $builder): DatatableCriteriaInterface
     {
         $start = $this->request->get('start') ?? 0;
         $length = $this->request->get('length') ?? 10;
@@ -142,7 +115,7 @@ abstract class CriteriaBase implements DatatableCriteriaInterface
         return $this;
     }
 
-    public function getTable(): Datatable\Table
+    public function getTable(): Table
     {
         return $this->table;
     }

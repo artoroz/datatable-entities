@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Artoroz\Datatable;
 
 use Artoroz\Datatable\Types\DatatableResult;
+use Artoroz\Datatable\Types\Field\ColumnField;
 use Artoroz\Datatable\Types\Field\Field;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,22 +13,19 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class Table extends DatatableResult
 {
     /**
-     * @var string $criteriaClassName
+     * @var class-string<DatatableCriteriaInterface> $criteriaClassName
      */
-    protected $criteriaClassName;
+    protected string $criteriaClassName;
+    /**
+     * @var class-string<object>|null $entityClassName
+     */
+    protected ?string $entityClassName = null;
+    protected DatatableCriteriaInterface $criteriaClass;
 
     /**
-     * @var string $entityClassName
+     * @param array<string, mixed> $options
      */
-    protected $entityClassName;
-
-    /**
-     * @var DatatableCriteriaInterface $criteriaClass
-     */
-    protected $criteriaClass;
-
-
-    public function __construct(Request $request, $user, $options = [])
+    public function __construct(Request $request, object $user, array $options = [])
     {
         parent::__construct($request);
         $this->response->draw = (int)$request->get('draw');
@@ -48,17 +46,25 @@ abstract class Table extends DatatableResult
         return $this;
     }
 
-    public function add($fieldName, $className, $options = []): Table
+    /**
+     * @param class-string<ColumnField> $className
+     * @param array<string, mixed> $options
+     */
+    public function add(string $fieldName, string $className, array $options = []): Table
     {
         $field = new $className($fieldName, $options);
         $this->fields->add($field);
         return $this;
     }
-    public function get($fieldName): ?Field
+
+    public function get(int|string $fieldName): ?ColumnField
     {
         return $this->fields->get($fieldName);
     }
 
+    /**
+     * @return array<array-key, array<string, mixed>>
+     */
     public function getColumns(): array
     {
         // TODO extend to some adapter class?
@@ -69,6 +75,9 @@ abstract class Table extends DatatableResult
         )->toArray();
     }
 
+    /**
+     * @return class-string<object>|null
+     */
     public function getEntityClassName(): ?string
     {
         return $this->entityClassName;

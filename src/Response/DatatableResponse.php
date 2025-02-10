@@ -4,30 +4,40 @@ declare(strict_types=1);
 
 namespace Artoroz\Datatable\Response;
 
+use Artoroz\Datatable\Types\Field\ColumnField;
 use Doctrine\Common\Collections\Collection;
 
+/**
+ * @phpstan-type BaseResponseArray array{
+ *     draw: int,
+ *     recordsTotal: int,
+ *     recordsFiltered: int,
+ * }
+ * @phpstan-type ResponseArray array{
+ *     draw: int,
+ *     recordsTotal: int,
+ *     recordsFiltered: int,
+ *     data: mixed,
+ * }
+ */
 class DatatableResponse
 {
+    public int $draw = 0;
     /**
-     * @var int $draw
+     * @var Collection<array-key, object> $entities
      */
-    public $draw;
-
+    protected Collection $entities;
+    public int $recordsTotal = 0;
+    public int $recordsFiltered = 0;
     /**
-     * @var Collection $entities
+     * @var Collection<array-key, ColumnField> $fields
      */
-    protected $entities;
-
-    public $recordsTotal;
-
-    public $recordsFiltered;
+    private Collection $fields;
 
     /**
-     * @var Collection $fields
+     * @return BaseResponseArray
      */
-    private $fields;
-
-    protected function getBase()
+    protected function getBase(): array
     {
         return [
             'draw'            => $this->draw,
@@ -36,7 +46,10 @@ class DatatableResponse
         ];
     }
 
-    public function getResponse()
+    /**
+     * @return ResponseArray
+     */
+    public function getResponse(): array
     {
         return array_merge(
             $this->getBase(),
@@ -45,20 +58,31 @@ class DatatableResponse
             ]
         );
     }
-    public function setData(Collection $entities)
+
+    /**
+     * @param Collection<array-key, object> $entities
+     */
+    public function setData(Collection $entities): void
     {
         $this->entities = $entities;
     }
-    public function setFields(Collection $fields)
+
+    /**
+     * @param Collection<array-key, ColumnField> $fields
+     */
+    public function setFields(Collection $fields): void
     {
         $this->fields = $fields;
     }
 
-    public function getData()
+    /**
+     * @return array<array-key, array<string, mixed>>
+     */
+    public function getData(): array
     {
         // method transformer
         $fields = $this->fields;
-        return $this->entities->map(function ($entity) use ($fields) {
+        return $this->entities->map(function (object $entity) use ($fields): array {
             $row = [];
             foreach ($fields as $field) {
                 $row[$field->name] = $field->parseField($entity);

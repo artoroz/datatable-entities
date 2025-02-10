@@ -6,7 +6,7 @@ namespace Artoroz\Datatable\Types\Field;
 
 class DropdownField extends ColumnField
 {
-    public $actions = [];
+    public mixed $actions = null;
 
     const BOOTSTRAP_ACTIONS_TEMPLATE = <<<BOOTSTRAP_ACTIONS_TEMPLATE
         <div class="btn-group table-actions">
@@ -19,7 +19,7 @@ class DropdownField extends ColumnField
         </div>
 BOOTSTRAP_ACTIONS_TEMPLATE;
 
-    public function parseOptions(array $options)
+    public function parseOptions(array $options): void
     {
         parent::parseOptions($options);
 
@@ -29,7 +29,7 @@ BOOTSTRAP_ACTIONS_TEMPLATE;
         $this->orderable = false;
     }
 
-    public function parseField($entity)
+    public function parseField(object $entity): mixed
     {
         if (is_callable($this->actions)) {
             return call_user_func($this->actions, $entity);
