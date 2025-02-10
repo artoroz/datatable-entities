@@ -2,6 +2,7 @@
 
 namespace Artoroz\Datatable\Types;
 
+use ArrayIterator;
 use Artoroz\Datatable\DatatableRepositoryInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
@@ -92,6 +93,7 @@ abstract class DatatableResult
 
         // When sorting on a non-existing database field (dynamic column)
         if ($orderProperty && $orderDirection) {
+            /** @var ArrayIterator $iterator */
             $iterator = $matches->getIterator();
             $iterator->uasort(function ($a, $b) use ($orderProperty, $orderDirection) {
 
