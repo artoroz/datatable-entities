@@ -4,6 +4,19 @@ declare(strict_types=1);
 
 namespace Artoroz\Datatable\Types\Field;
 
+/**
+ * @phpstan-type OptionsArray array{
+ *     queryField?: string,
+ *     title?: string,
+ *     data?: array<string, mixed>|string,
+ *     searchable?: bool,
+ *     orderable?: bool,
+ *     visible?: bool,
+ *     className?: ?string,
+ *     transformer?: mixed,
+ *     raw?: bool,
+ * }
+ */
 class ColumnField extends Field
 {
     public string $title = '';
@@ -19,7 +32,7 @@ class ColumnField extends Field
     public bool $raw = false;
 
     /**
-     * @param array<string, mixed> $options
+     * @param OptionsArray $options
      */
     public function __construct(string $field, array $options)
     {
@@ -29,7 +42,7 @@ class ColumnField extends Field
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param OptionsArray $options
      */
     public function parseOptions(array $options): void
     {
@@ -73,7 +86,7 @@ class ColumnField extends Field
         if (is_callable($this->transformer)) {
             $entry = call_user_func($this->transformer, $entry, $entity);
         }
-        if (! $this->raw) {
+        if (! $this->raw && is_string($entry)) {
             $entry = htmlspecialchars($entry);
         }
         return $entry;

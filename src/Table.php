@@ -10,6 +10,9 @@ use Artoroz\Datatable\Types\Field\Field;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @phpstan-import-type OptionsArray from ColumnField
+ */
 abstract class Table extends DatatableResult
 {
     /**
@@ -28,7 +31,8 @@ abstract class Table extends DatatableResult
     public function __construct(Request $request, object $user, array $options = [])
     {
         parent::__construct($request);
-        $this->response->draw = (int)$request->get('draw');
+        $draw = $request->get('draw');
+        $this->response->draw = is_numeric($draw) ? (int) $draw : 0;
         $this->fields = new ArrayCollection();
         $this->user = $user;
         $this->options = new ArrayCollection($options);
@@ -48,7 +52,7 @@ abstract class Table extends DatatableResult
 
     /**
      * @param class-string<ColumnField> $className
-     * @param array<string, mixed> $options
+     * @param OptionsArray $options
      */
     public function add(string $fieldName, string $className, array $options = []): Table
     {

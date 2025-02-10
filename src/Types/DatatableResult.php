@@ -57,6 +57,7 @@ abstract class DatatableResult
         $this->response->recordsFiltered = $this->repository->countResults(clone $criteria);
 
         if ($criteria instanceof QueryBuilder) {
+            /** @var array<array-key, object> $matches */
             $matches = $criteria->getQuery()
                 ->getResult();
         } else {
@@ -91,7 +92,9 @@ abstract class DatatableResult
             $iterator->uasort(function ($a, $b) use ($orderProperty, $orderDirection) {
 
                 $propertyAccessor = PropertyAccess::createPropertyAccessor();
+                /** @var string $aValue */
                 $aValue = $propertyAccessor->getValue($a, $orderProperty);
+                /** @var string $bValue */
                 $bValue = $propertyAccessor->getValue($b, $orderProperty);
 
                 if ($orderDirection == 'DESC') {

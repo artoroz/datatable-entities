@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace Artoroz\Datatable\Types\Field;
 
+/**
+ * @phpstan-import-type OptionsArray from ColumnField
+ */
 class UrlField extends ColumnField
 {
     public mixed $url_builder = null;
 
+    /**
+     * @param array{url_builder?: mixed}&OptionsArray $options
+     */
     public function parseOptions(array $options): void
     {
         parent::parseOptions($options);
