@@ -3,6 +3,7 @@ namespace Artoroz\Datatable\Criteria;
 
 use Artoroz\Datatable\DatatableCriteriaInterface;
 use Artoroz\Datatable\Table;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Artoroz\Datatable;
 use ErrorException;
