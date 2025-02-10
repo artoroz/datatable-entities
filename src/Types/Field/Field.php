@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Artoroz\Datatable\Types\Field;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;

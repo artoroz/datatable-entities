@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Artoroz\Datatable\Types\Field;
 
 class DropdownField extends ColumnField
