@@ -34,4 +34,8 @@ interface DatatableCriteriaInterface
      * @return DatatableCriteriaInterface
      */
     public function pagination($builder): DatatableCriteriaInterface;
+
+    public function getTable(): Table;
+    public function getDataOrderProperty(): ?string;
+    public function getDataOrderDirection(): ?string;
 }
