@@ -5,7 +5,7 @@ namespace Artoroz\Datatable;
 use Doctrine\Common\Collections\Collection;
 
 /**
- * @phpstan-type DataTableQueryBuilder \Somnambulist\CTEBuilder\ExpressionBuilder|\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder
+ * @phpstan-type DataTableQueryBuilder \Somnambulist\Components\CTEBuilder\ExpressionBuilder|\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder
  */
 interface DatatableRepositoryInterface
 {
