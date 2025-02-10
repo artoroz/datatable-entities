@@ -62,7 +62,11 @@ abstract class DatatableResult
         } else {
             $matches = [];
 
-            foreach ($criteria->execute()->fetchAllAssociative() as $record) {
+            $records = $criteria instanceof ExpressionBuilder
+                ? $criteria->execute()->fetchAllAssociative()
+                : $criteria->fetchAllAssociative();
+
+            foreach ($records as $record) {
                 $matches[] = (object) $record;
             }
         }
