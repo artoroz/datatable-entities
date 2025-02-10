@@ -32,6 +32,26 @@ abstract class DatatableResult
      */
     protected $request;
 
+    /**
+     * @var ArrayCollection $fields
+     */
+    protected $fields;
+
+    /**
+     * @var object $user
+     */
+    protected $user;
+
+    /**
+     * @var DatatableRepositoryInterface $repository
+     */
+    public $repository;
+
+    /**
+     * @var ArrayCollection $options
+     */
+    public $options;
+
     public function __construct(Table $table, Request $request)
     {
         $this->response = new DatatableResponse();

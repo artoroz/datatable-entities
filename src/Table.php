@@ -19,26 +19,6 @@ abstract class Table extends DatatableResult
     protected $entityClassName;
 
     /**
-     * @var ArrayCollection $fields
-     */
-    protected $fields;
-
-    /**
-     * @var object $user
-     */
-    protected $user;
-
-    /**
-     * @var DatatableRepositoryInterface $repository
-     */
-    public $repository;
-
-    /**
-     * @var ArrayCollection $options
-     */
-    public $options;
-
-    /**
      * @var DatatableCriteriaInterface $criteriaClass
      */
     protected $criteriaClass;
