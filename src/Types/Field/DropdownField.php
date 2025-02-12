@@ -1,9 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Artoroz\Datatable\Types\Field;
 
+use InvalidArgumentException;
+
+/**
+ * @phpstan-import-type OptionsArray from ColumnField
+ */
 class DropdownField extends ColumnField
 {
-    public $actions = [];
+    public mixed $actions = null;
 
     const BOOTSTRAP_ACTIONS_TEMPLATE = <<<BOOTSTRAP_ACTIONS_TEMPLATE
         <div class="btn-group table-actions">
@@ -16,22 +24,32 @@ class DropdownField extends ColumnField
         </div>
 BOOTSTRAP_ACTIONS_TEMPLATE;
 
-    public function parseOptions(array $options)
+    /**
+     * @param array{actions?: mixed}&OptionsArray $options
+     */
+    public function parseOptions(array $options): void
     {
         parent::parseOptions($options);
 
         $this->data = 'dropdown';
-        $this->actions = $options['actions'] ?? [];
         $this->searchable = false;
         $this->orderable = false;
+
+        $actions = $options['actions'] ?? null;
+
+        if ($actions !== null && ! is_callable($actions)) {
+           throw new InvalidArgumentException('Actions must be callable or null');
+        }
+
+        $this->actions = $actions;
     }
 
-    public function parseField($entity)
+    public function parseField(object $entity): mixed
     {
         if (is_callable($this->actions)) {
             return call_user_func($this->actions, $entity);
         }
-        return parent::parseField($entity);
 
+        return null;
     }
 }

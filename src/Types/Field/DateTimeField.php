@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Artoroz\Datatable\Types\Field;
 
 class DateTimeField extends ColumnField
 {
-    public function parseOptions(array $options)
+    public function parseOptions(array $options): void
     {
         parent::parseOptions($options);
 
@@ -14,7 +16,7 @@ class DateTimeField extends ColumnField
         ];
     }
 
-    public function parseField($entity)
+    public function parseField(object $entity): mixed
     {
         $entry = $this->getFromEntity($entity);
         if (!$entry instanceof \DateTime) {

@@ -1,0 +1,9 @@
+parameters:
+  level: max
+  tmpDir: phpstan-cache
+  paths:
+    - src
+  ignoreErrors:
+    -
+      message: '#Trait Artoroz\\Datatable\\DatatableTrait is used zero times and is not analysed\.#'
+      path: src/DatatableTrait.php

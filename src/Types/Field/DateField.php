@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Artoroz\Datatable\Types\Field;
 
 class DateField extends ColumnField
 {
-    public function parseOptions(array $options)
+    public function parseOptions(array $options): void
     {
         parent::parseOptions($options);
 
@@ -12,7 +15,7 @@ class DateField extends ColumnField
             'sort' => $this->name . '.timestamp'
         ];
     }
-    public function parseField($entity)
+    public function parseField(object $entity): mixed
     {
         $entry = $this->getFromEntity($entity);
         if (!$entry instanceof \DateTime) {

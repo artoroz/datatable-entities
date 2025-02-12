@@ -1,13 +1,30 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Artoroz\Datatable;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 trait DatatableTrait
 {
-    protected function createTable($tableClass, $entityClass, Request $request, $options = []): Table
+    abstract protected function getDoctrine(): ManagerRegistry;
+
+    /**
+     * @return UserInterface|null
+     */
+    abstract protected function getUser();
+
+    /**
+     * @param class-string<Table> $tableClass
+     * @param class-string<object>|DatatableRepositoryInterface $entityClass
+     * @param array<string, mixed> $options
+     */
+    protected function createTable(string $tableClass, string|DatatableRepositoryInterface $entityClass, Request $request, array $options = []): Table
     {
-        $em = isset($options['em']) ? $options['em'] : $this->getDoctrine()->getManager();
+        $em = $options['em'] ?? $this->getDoctrine()->getManager();
 
         if ($entityClass instanceof DatatableRepositoryInterface) {
             $repository = $entityClass;

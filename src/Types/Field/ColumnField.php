@@ -1,19 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Artoroz\Datatable\Types\Field;
 
+/**
+ * @phpstan-type OptionsArray array{
+ *     queryField?: string,
+ *     title?: string,
+ *     data?: array<string, mixed>|string,
+ *     searchable?: bool,
+ *     orderable?: bool,
+ *     visible?: bool,
+ *     className?: ?string,
+ *     transformer?: mixed,
+ *     raw?: bool,
+ * }
+ */
 class ColumnField extends Field
 {
-    public $title = '';
-    public $data = '';
-    public $searchable = true;
-    public $orderable = true;
-    public $visible = true;
-    public $className = null;
-    public $transformer = null;
-    public $raw = null;
+    public string $title = '';
+    /**
+     * @var array<string, mixed>|string
+     */
+    public array|string $data = '';
+    public bool $searchable = true;
+    public bool $orderable = true;
+    public bool $visible = true;
+    public ?string $className = null;
+    public mixed $transformer = null;
+    public bool $raw = false;
 
-    public function parseOptions(array $options)
+    /**
+     * @param OptionsArray $options
+     */
+    public function __construct(string $field, array $options)
+    {
+        parent::__construct($field);
+
+        $this->parseOptions($options);
+    }
+
+    /**
+     * @param OptionsArray $options
+     */
+    public function parseOptions(array $options): void
     {
         $this->queryField = $options['queryField'] ?? $this->queryField;
         $this->title = $options['title'] ?? '';
@@ -26,7 +57,18 @@ class ColumnField extends Field
         $this->raw = $options['raw'] ?? false;
     }
 
-    public function toArray()
+    /**
+     * @return array{
+     *     name: string,
+     *     title: string,
+     *     data: array<string, mixed>|string,
+     *     searchable: bool,
+     *     orderable: bool,
+     *     visible: bool,
+     *     className: ?string,
+     * }
+     */
+    public function toArray(): array
     {
         return array_merge(parent::toArray(), [
             'title' => $this->title,
@@ -38,13 +80,13 @@ class ColumnField extends Field
         ]);
     }
 
-    public function parseField($entity)
+    public function parseField(object $entity): mixed
     {
         $entry = $this->getFromEntity($entity);
         if (is_callable($this->transformer)) {
             $entry = call_user_func($this->transformer, $entry, $entity);
         }
-        if (! $this->raw) {
+        if (! $this->raw && is_string($entry)) {
             $entry = htmlspecialchars($entry);
         }
         return $entry;

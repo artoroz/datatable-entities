@@ -1,72 +1,65 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Artoroz\Datatable\Criteria;
 
 use Artoroz\Datatable\DatatableCriteriaInterface;
 use Artoroz\Datatable\Table;
-use Symfony\Component\HttpFoundation\Request;
-use Artoroz\Datatable;
+use Artoroz\Datatable\Types\Field\ColumnField;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\QueryBuilder;
 use ErrorException;
+use Exception;
+use Somnambulist\Components\CTEBuilder\ExpressionBuilder;
+use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @phpstan-import-type DataTableQueryBuilder from DatatableRepositoryInterface
- */
 abstract class CriteriaBase implements DatatableCriteriaInterface
 {
-    /**
-     * @var Request $request;
-     */
-    protected $request;
+    protected string $prefix = '';
+    protected ?string $dataOrderProperty = null;
+    protected ?string $dataOrderDirection = null;
 
-    /**
-     * @var string $prefix;
-     */
-    protected $prefix = '';
-
-    /**
-     * @var Table $table
-     */
-    protected $table;
-
-    /**
-     * @var string $dataOrderProperty
-     */
-    protected $dataOrderProperty;
-
-    /**
-     * @var string $dataOrderDirection
-     */
-    protected $dataOrderDirection;
-
-    /**
-     * CriteriaBase constructor.
-     *
-     * @param Table $table
-     * @param Request $request
-     */
-    public function __construct($table, Request $request)
-    {
-        $this->table  = $table;
-        $this->request = $request;
+    public function __construct(
+        protected Table $table,
+        protected Request $request,
+    ) {
     }
 
-    public function getSearchField()
+    public function getSearchField(): mixed
     {
         return $this->request->get('search');
     }
 
+    /**
+     * @return array<string, mixed>|array{error:Exception}
+     */
     protected function getFilterRequest() : array
     {
         $fields = [];
         try {
             $columns = $this->request->get('columns');
 
+            if (! is_array($columns)) {
+                return [];
+            }
+
             foreach ($columns as $id => $column) {
-                if (empty($column['search']['value'])) {
+                if (! is_array($column)) {
                     continue;
                 }
-                $field = $column['name'];
 
-                $fields[$field] = $column['search']['value'];
+                $field  = $column['name'] ?? null;
+                $search = $column['search'];
+                $searchValue = is_array($search)
+                    ? $search['value'] ?? null
+                    : null;
+
+                if (! is_string($field) || empty($searchValue)) {
+                    continue;
+                }
+
+                $fields[$field] = $searchValue;
             }
 
             return $fields;
@@ -75,19 +68,35 @@ abstract class CriteriaBase implements DatatableCriteriaInterface
         }
     }
 
-    protected function getOrderBy()
+    /**
+     * @return array{0:string, 1:string}|false
+     */
+    protected function getOrderBy(): array|false
     {
-        $order = (array) $this->request->get('order');
+        $order = $this->request->get('order');
+
+        if (! is_array($order)) {
+            return false;
+        }
+
         try {
-            if (! array_key_exists(0, $order) ||
-                ! array_key_exists('column', $order[0])) {
+            $firstValue = $order[0] ?? null;
+
+            if (! is_array($firstValue)) {
                 return false;
             }
-            $field = $this->getFieldByNumber($order[0]['column']);
+
+            $firstColumn = $firstValue['column'] ?? null;
+
+            if (! is_int($firstColumn) && ! is_string($firstColumn)) {
+                return false;
+            }
+
+            $field = $this->getFieldByNumber($firstColumn);
             if (is_null($field)) {
                 return false;
             }
-            $direction = $order[0]['dir'] == 'asc' ? 'ASC': 'DESC';
+            $direction = ($firstValue['dir'] ?? 'asc') === 'asc' ? 'ASC': 'DESC';
 
             // Check if the propert exists in the Class for ordering a dynamic column
             if ($this->table->getEntityClassName()) {
@@ -110,34 +119,29 @@ abstract class CriteriaBase implements DatatableCriteriaInterface
         }
     }
 
-    protected function getFieldByNumber($column)
+    protected function getFieldByNumber(int|string $column): ?ColumnField
     {
         return $this->table->get($column);
     }
 
-    protected function getOption($key)
+    protected function getOption(string $key): mixed
     {
         return $this->table->options->get($key);
     }
 
-    /**
-     * @param DataTableQueryBuilder $builder
-     *
-     * @return DatatableCriteriaInterface
-     */
-    public function pagination($builder): DatatableCriteriaInterface
+    public function pagination(ExpressionBuilder|QueryBuilder|DbalQueryBuilder $builder): DatatableCriteriaInterface
     {
-        $start = $this->request->get('start') ?? 0;
-        $length = $this->request->get('length') ?? 10;
+        $start = $this->request->get('start');
+        $length = $this->request->get('length');
         $builder
-            ->setFirstResult($start)
-            ->setMaxResults($length)
+            ->setFirstResult(is_numeric($start) ? (int) $start : 0)
+            ->setMaxResults(is_numeric($length) ? (int) $length : 10)
         ;
 
         return $this;
     }
 
-    public function getTable(): Datatable\Table
+    public function getTable(): Table
     {
         return $this->table;
     }

@@ -1,43 +1,49 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Artoroz\Datatable\Types;
 
-use Artoroz\Datatable\Table;
-use Artoroz\Datatable\DatatableRepositoryInterface;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\HttpFoundation\Request;
+use ArrayIterator;
 use Artoroz\Datatable\DatatableCriteriaInterface;
-use Doctrine\Common\Collections\ArrayCollection;
+use Artoroz\Datatable\DatatableRepositoryInterface;
 use Artoroz\Datatable\Response\DatatableResponse;
+use Artoroz\Datatable\Types\Field\ColumnField;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\QueryBuilder;
+use Somnambulist\Components\CTEBuilder\ExpressionBuilder;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
- * @phpstan-import-type DataTableQueryBuilder from DatatableRepositoryInterface
+ * @phpstan-import-type ResponseArray from DatatableResponse
  */
 abstract class DatatableResult
 {
+    protected DatatableResponse $response;
+    protected DatatableCriteriaInterface $criteriaClass;
     /**
-     * @var DatatableResponse
+     * @var ArrayCollection<array-key, ColumnField> $fields
      */
-    protected $response;
-
+    protected ArrayCollection $fields;
+    protected object $user;
+    public DatatableRepositoryInterface $repository;
     /**
-     * @var DatatableCriteriaInterface $criteriaClass
+     * @var ArrayCollection<string, mixed> $options
      */
-    protected $criteriaClass;
+    public ArrayCollection $options;
 
-    /**
-     * @var Request $request
-     */
-    protected $request;
-
-    public function __construct(Table $table, Request $request)
-    {
+    public function __construct(
+        protected Request $request,
+    ) {
         $this->response = new DatatableResponse();
-        $this->request = $request;
     }
 
+    /**
+     * @return Collection<array-key, object>
+     */
     protected function getMatches(): Collection
     {
         $criteria = $this->repository->createBuilder($this->options);
@@ -51,19 +57,27 @@ abstract class DatatableResult
         $this->response->recordsFiltered = $this->repository->countResults(clone $criteria);
 
         if ($criteria instanceof QueryBuilder) {
+            /** @var array<array-key, object> $matches */
             $matches = $criteria->getQuery()
                 ->getResult();
         } else {
             $matches = [];
 
-            foreach ($criteria->execute()->fetchAllAssociative() as $record) {
+            $records = $criteria instanceof ExpressionBuilder
+                ? $criteria->execute()->fetchAllAssociative()
+                : $criteria->fetchAllAssociative();
+
+            foreach ($records as $record) {
                 $matches[] = (object) $record;
             }
         }
         return new ArrayCollection($matches);
     }
 
-    public function getResultSet()
+    /**
+     * @return ResponseArray
+     */
+    public function getResultSet(): array
     {
         $matches = $this->getMatches();
 
@@ -73,11 +87,14 @@ abstract class DatatableResult
 
         // When sorting on a non-existing database field (dynamic column)
         if ($orderProperty && $orderDirection) {
+            /** @var ArrayIterator<array-key, object> $iterator */
             $iterator = $matches->getIterator();
             $iterator->uasort(function ($a, $b) use ($orderProperty, $orderDirection) {
 
                 $propertyAccessor = PropertyAccess::createPropertyAccessor();
+                /** @var string $aValue */
                 $aValue = $propertyAccessor->getValue($a, $orderProperty);
+                /** @var string $bValue */
                 $bValue = $propertyAccessor->getValue($b, $orderProperty);
 
                 if ($orderDirection == 'DESC') {
@@ -95,10 +112,7 @@ abstract class DatatableResult
         return $this->response->getResponse();
     }
 
-    /**
-     * @param DataTableQueryBuilder $builder
-     */
-    public function attachFilters($builder): void
+    public function attachFilters(ExpressionBuilder|QueryBuilder|DbalQueryBuilder$builder): void
     {
         $this->criteriaClass
             ->filter($builder)

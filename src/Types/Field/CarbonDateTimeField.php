@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Artoroz\Datatable\Types\Field;
 
 use Carbon\CarbonInterface;
 
 class CarbonDateTimeField extends DateTimeField
 {
-    public function parseField($entity)
+    public function parseField(object $entity): mixed
     {
         $entry = $this->getFromEntity($entity);
 
